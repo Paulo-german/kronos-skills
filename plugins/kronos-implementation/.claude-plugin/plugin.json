@@ -1,0 +1,10 @@
+{
+  "name": "kronos-implementation",
+  "description": "Guia a implantação de um cliente no Kronos Hub, da coleta do briefing ao go-live, usando o conector MCP Kronos Hub.",
+  "author": {
+    "name": "Kronos Hub"
+  },
+  "homepage": "https://app.kronoshub.com.br",
+  "repository": "https://github.com/Paulo-german/kronos-skills",
+  "keywords": ["kronos", "crm", "onboarding", "implantacao", "agentes-de-ia"]
+}

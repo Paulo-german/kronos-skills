@@ -1,0 +1,14 @@
+{
+  "name": "kronos",
+  "description": "Skills da Kronos Hub para agentes de IA",
+  "owner": {
+    "name": "Kronos Hub"
+  },
+  "plugins": [
+    {
+      "name": "kronos-implementation",
+      "source": "./plugins/kronos-implementation",
+      "description": "Guia a implantação de um cliente no Kronos Hub, da coleta do briefing ao go-live, usando o conector MCP Kronos Hub."
+    }
+  ]
+}
