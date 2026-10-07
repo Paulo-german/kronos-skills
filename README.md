@@ -38,14 +38,14 @@ Alternativa manual: copie a pasta `plugins/kronos-implementation/skills/kronos-i
 
 ## Para quem mantém este repositório
 
-O conteúdo de `plugins/kronos-implementation/skills/` é um **espelho** da skill que vive no repositório privado `kronos-crm` (as tools do MCP mudam junto com o código dele). Não edite esses arquivos aqui: a próxima sincronização sobrescreve tudo.
+Este é o repositório de origem da skill: edite os arquivos de `plugins/kronos-implementation/skills/kronos-implementation/` aqui mesmo. Os cenários de teste ficam em `evals/` e não vão no plugin nem no zip.
 
-Para atualizar:
+Sempre que uma tool do conector MCP mudar (nome, entrada, escopo ou comportamento), revise `references/tools.md` e as fases que a usam.
+
+Para gerar o zip dos uploads manuais:
 
 ```
-bash scripts/sync-from-crm.sh   # KRONOS_CRM_DIR altera a origem
-bash scripts/build-zip.sh       # opcional, para os uploads em zip
-git status
+bash scripts/build-zip.sh
 ```
 
 Não há versionamento: o Claude Code usa o commit como versão.

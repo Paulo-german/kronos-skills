@@ -11,7 +11,7 @@ OUT_FILE="$OUT_DIR/$SKILL_NAME.zip"
 
 if [ ! -f "$SKILL_PARENT/$SKILL_NAME/SKILL.md" ]; then
   echo "Erro: SKILL.md não encontrado em $SKILL_PARENT/$SKILL_NAME" >&2
-  echo "Rode antes: bash scripts/sync-from-crm.sh" >&2
+  echo "Confira se a pasta da skill existe em plugins/kronos-implementation/skills/." >&2
   exit 1
 fi
 

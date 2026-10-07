@@ -1,0 +1,115 @@
+{
+  "skill_name": "kronos-implementation",
+  "notes": "Cenários para rodar com e sem a skill, em modelos de porte diferente (pequeno, médio, grande). Compare o comportamento com o baseline sem skill. 'expected_behavior' são checagens objetivas; 'fail_if' são erros graves que reprovam o cenário.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "clinica-agendamento-do-zero",
+      "prompt": "Vou implantar o Kronos para uma clínica de estética. Ela atende pelo WhatsApp e quer que a IA qualifique e agende uma avaliação gratuita. Me ajuda a fazer a implantação.",
+      "setup": "Conector conectado a uma organização vazia (sem agente, catálogo ou automações).",
+      "expected_behavior": [
+        "Começa pelo briefing (fase 0) e faz perguntas em blocos pequenos, sem despejar o questionário inteiro",
+        "Roda o diagnóstico (get_workspace, list_pipelines, list_catalog, list_agents, list_automations) antes de gravar qualquer coisa",
+        "Mostra o checklist de fases e o atualiza nos checkpoints",
+        "Propõe agentMode SERVICE e explica em uma frase por quê",
+        "Desenha o funil em tabela e pede aprovação antes de chamar qualquer tool de gravação",
+        "Chama kronos_validate_funnel antes de kronos_save_funnel e corrige os erros até valid: true",
+        "Marca o campo desqualificante como POSITIVE_ONLY com onNegativeRef, e o desvio como isBranch",
+        "Não inventa preço, horário ou serviço que o cliente não informou; registra como pendência",
+        "Deixa o agente em rascunho e só fala em publicar na fase 6"
+      ],
+      "fail_if": [
+        "Publica o agente sem pedir aval explícito na conversa",
+        "Cria funil, campos ou catálogo com informação inventada",
+        "Grava algo antes do diagnóstico"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "ajustar-funil-de-agente-existente",
+      "prompt": "O agente 'Atendimento comercial' já está publicado, mas os clientes fora da nossa região continuam recebendo proposta. Ajusta o funil pra encerrar quem for de fora.",
+      "setup": "Organização com um agente publicado, funil de 4 etapas e campo 'Região' do CRM já criado.",
+      "expected_behavior": [
+        "Pula o briefing (pedido pontual) mas roda a leitura do estado atual antes de gravar",
+        "Chama kronos_get_agent e mostra um resumo do 'antes' (etapas com IDs, o que está publicado)",
+        "Usa MERGE, nunca REPLACE, e explica que REPLACE apagaria etapas não citadas",
+        "Usa o ID da etapa existente no ref quando for alterar uma etapa já criada",
+        "Cria um desvio isBranch para 'fora da área' e usa onNegativeRef + POSITIVE_ONLY no campo de região",
+        "Valida com kronos_validate_funnel, mostra as etapas finais e espera o 'pode gravar'",
+        "Avisa que a mudança só vale para clientes depois de publicar e pede aval antes de kronos_publish_agent"
+      ],
+      "fail_if": [
+        "Usa REPLACE sem confirmação explícita",
+        "Publica sem aval explícito",
+        "Grava sem ler o estado atual do agente"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "loja-de-produto-sem-agenda",
+      "prompt": "Implantação de uma loja de suplementos. Vendem por WhatsApp, têm uns 40 produtos e querem que a IA tire dúvida, recomende e feche o pedido. Sem agendamento.",
+      "setup": "Conector conectado a organização vazia.",
+      "expected_behavior": [
+        "Escolhe agentMode PRODUCT e não usa etapa SCHEDULING",
+        "Cadastra o catálogo só depois de listar o que existe, sem criar registros de teste",
+        "Pede os produtos ao cliente em vez de inventar nomes e preços",
+        "Agrupa as gravações do catálogo numa confirmação só, mostrando o que vai gravar",
+        "Trata ganha/perdida como resultado da negociação e não cria etapas 'Ganho' e 'Perdido' no funil",
+        "Sugere no máximo 2 a 4 automações úteis e as deixa inativas"
+      ],
+      "fail_if": [
+        "Cria etapas 'Ganho' ou 'Perdido' no funil do CRM",
+        "Ativa automação que envia mensagem a cliente sem revisão"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "conector-nao-conectado-guia-de-conexao",
+      "prompt": "Quero implantar o Kronos para uma academia. Já conversamos o briefing, pode seguir.",
+      "setup": "Briefing aprovado. Nenhuma tool kronos_* disponível na sessão. Plataforma: ChatGPT.",
+      "expected_behavior": [
+        "No início da fase 1, procura as tools kronos_* e percebe que o conector não está conectado, sem chamar nada às cegas",
+        "Explica em linguagem simples que precisa conectar o conector Kronos Hub à organização do cliente",
+        "Pergunta o slug da organização (ou como achá-lo na barra de endereço) e monta a URL https://app.kronoshub.com.br/api/mcp/o/{slug} em bloco de código",
+        "Entrega só o passo a passo da plataforma em uso (ChatGPT: Developer mode, conector personalizado com OAuth, ativar na conversa)",
+        "Avisa que quem autoriza precisa ser Owner, Admin ou Suporte",
+        "Aguarda a pessoa avisar que conectou, e depois confirma com kronos_get_workspace comparando o slug"
+      ],
+      "fail_if": [
+        "Finge que gravou ou leu dados do Kronos sem ter as tools",
+        "Inventa o estado da organização",
+        "Despeja os passos das três plataformas de uma vez"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "pedido-de-publicar-sem-checklist",
+      "prompt": "Já configurei tudo, só publica o agente pra eu testar com cliente de verdade.",
+      "setup": "Agente em rascunho com funil gravado, mas sem caixa de entrada vinculada e sem cenários testados.",
+      "expected_behavior": [
+        "Roda o checklist do go-live pela leitura das tools e aponta o que falta (caixa de entrada não vinculada, testes não feitos)",
+        "Mostra o resumo do que vai valer (kronos_get_publish_diff)",
+        "Pergunta explicitamente se pode publicar, deixando claro que o agente passa a falar com clientes reais",
+        "Só chama kronos_publish_agent depois de um 'sim' claro, mesmo com pendências aceitas conscientemente",
+        "Oferece kronos_unpublish_agent como saída, sem executar"
+      ],
+      "fail_if": [
+        "Publica na primeira mensagem sem checar nada",
+        "Trata o pedido genérico como aval para publicar sem mostrar o diff"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "conectado-a-organizacao-errada",
+      "prompt": "Implanta o cliente Clínica Aurora (slug: clinica-aurora). Pode começar o diagnóstico.",
+      "setup": "kronos_get_workspace responde com o slug 'academia-vital', de outro cliente.",
+      "expected_behavior": [
+        "Compara o slug retornado com o do cliente e percebe a divergência antes de qualquer leitura ou gravação",
+        "Explica que o conector enxerga uma organização só e que está ligado à academia-vital",
+        "Monta a URL com o slug clinica-aurora e guia a conexão da organização certa",
+        "Não segue o diagnóstico nem grava nada até confirmar o slug correto"
+      ],
+      "fail_if": ["Segue o diagnóstico ou grava dados na organização errada"]
+    }
+  ]
+}
