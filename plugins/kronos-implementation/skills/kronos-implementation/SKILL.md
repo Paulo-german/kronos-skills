@@ -57,7 +57,7 @@ Implantação - [nome do cliente]
 
 Outros arquivos, sempre a um clique daqui: `references/tools.md` (mapa das tools e o que só existe na interface) e `references/exemplo-clinica-agendamento.md` (funil completo de exemplo, para usar na fase 4 como ponto de partida, nunca copiado sem adaptar).
 
-Comece sempre pela fase 0, a menos que a pessoa diga que já tem o briefing ou peça só uma parte (por exemplo, "só ajustar o funil do agente"). Nesse caso pule para a fase pedida, mas rode o diagnóstico antes de gravar qualquer coisa.
+Comece sempre pela fase 0 (se o cliente tiver site ou perfil público, pesquise antes de perguntar, como em `references/01-briefing.md`), a menos que a pessoa diga que já tem o briefing ou peça só uma parte (por exemplo, "só ajustar o funil do agente"). Nesse caso pule para a fase pedida, mas rode o diagnóstico antes de gravar qualquer coisa.
 
 ### Fase 1 - Conexão e diagnóstico (sempre antes de gravar)
 
